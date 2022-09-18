@@ -1,7 +1,10 @@
 const express = require('express');
 const app = express();
 const router = express.Router()
+const FM = require('./fileManipulations')
 const SpotifyWebApi = require('spotify-web-api-node');
+const fm = new FM();
+
 
 const spotifyApi = new SpotifyWebApi({
     clientId: '59f0a72507574fb6854ec229791be2db',
@@ -40,9 +43,7 @@ async function getPlayListMusics(id) {
             const myArr = data.body.tracks.items
             for (i of myArr) {
                 for (artist of i.track.artists) {
-                    // musicArr.push(`${artist.name} - ${i.track.name}`)
                     musicArr.push([artist.name, i.track.name])
-                        // console.log(typeof `${artist.name} - ${i.track.name}`)
                 }
             }
 
@@ -57,7 +58,14 @@ router.get('/callback', (req, res, next) => {
             spotifyApi.setAccessToken(response.body.access_token)
             getPlayListMusics('3wKIZ3I7S5QWrpXsEVaKTc')
                 .then(data => {
-                    console.log(data)
+                    for ([i, b] of data) {
+                        let music = `${i} - ${b}\n`
+                        fs.appendFile(`music.txt`, music, (err) => {
+                            if (err) throw err;
+                        })
+
+                        console.log('ok')
+                    }
                 })
 
         })
