@@ -1,36 +1,36 @@
+const puppeteer = require('puppeteer');
 const fs = require('fs');
-const axios = require('axios');
-const jsdom = require('jsdom');
-const { JSDOM } = jsdom;
 
 
-// fs.readFile(`music.txt`, (err, data) => {
-//     if (err) throw err;
-//     for (let i of data.toString().split('\n')) {
-//         console.log(`https://www.youtube.com/results?search_query=${i}`)
-//         axios.get(`https://www.youtube.com/results?search_query=${i}`)
-//             .then((res) => {
-//                 let currentPage = res.data;
-//                 const dom = new JSDOM(currentPage);
+const arr = fs.readFileSync('music.txt').toString().split('\n');
 
-//                 let videoLink = dom.window.document.querySelector('a.ytd-video-renderer').href;
-//                 fs.appendFile('music_link.txt', videoLink, (err) => {
-//                     if (err) throw err;
-//                 })
 
-//             })
-//     }
-// })
+async function main(music_name) {
+    try {
+        const browser = await puppeteer.launch();
+        const [page] = await browser.pages();
 
-axios.get(`https://www.youtube.com/results?search_query=Rebel+Scum+-+Back+Up`)
-    .then((res) => {
-        let currentPage = res.data;
-        const dom = new JSDOM(currentPage);
 
-        let videoLink = dom.window.document.getElementById('video-title').href
-        console.log(videoLink)
-        fs.appendFile('music_link.txt', JSON.stringify(videoLink), (err) => {
+        await page.goto(`https://www.youtube.com/results?search_query=${music_name}`);
+        const href = await page.$eval("#video-title", (elm) => elm.href);
+        console.log(href)
+        fs.appendFileSync('music_link.txt', href + '\n', err => {
             if (err) throw err;
         })
 
-    })
+
+        await browser.close();
+        return
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+async function start() {
+    for (let i of arr) {
+        await main(i)
+        console.log(i)
+    }
+}
+
+start()

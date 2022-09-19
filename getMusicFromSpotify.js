@@ -1,14 +1,14 @@
 const express = require('express');
 const app = express();
-const router = express.Router()
-const FM = require('./fileManipulations')
+const router = express.Router();
+const fs = require('fs');
 const SpotifyWebApi = require('spotify-web-api-node');
-const fm = new FM();
+
 
 
 const spotifyApi = new SpotifyWebApi({
-    clientId: '59f0a72507574fb6854ec229791be2db',
-    clientSecret: '50c1de00ceef4255a6e94a7f8f8e7c83',
+    clientId: '',
+    clientSecret: '',
     redirectUri: 'http://localhost:8081/callback'
 });
 
@@ -60,7 +60,7 @@ router.get('/callback', (req, res, next) => {
                 .then(data => {
                     for ([i, b] of data) {
                         let music = `${i} - ${b}\n`
-                        fs.appendFile(`music.txt`, music, (err) => {
+                        fs.appendFile(`music.txt`, music.replace(/ /g, '+'), (err) => {
                             if (err) throw err;
                         })
 
@@ -75,4 +75,5 @@ router.get('/callback', (req, res, next) => {
 app.use('/', router)
 app.listen(8081, () => {
     console.log('App start')
+    console.log('http://localhost:8081')
 })
