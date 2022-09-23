@@ -1,0 +1,10 @@
+{
+    "music": {
+        "save_path": ""
+    },
+
+    "user_info": {
+        "clientId": "",
+        "clientSecret": ""
+    }
+}
